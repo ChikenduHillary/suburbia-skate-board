@@ -21,12 +21,14 @@ export function Bounded<C extends ElementType = "section">({
   ...restProps
 }: BoundedProps<C>) {
   return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     <Comp
       className={clsx(
         "px-6 ~py-10/16 [.header+&]:pt-44 [.header+&]:md:pt-32",
         className
       )}
       style={style}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {...(restProps as any)}
     >
       <div className="mx-auto w-full max-w-6xl">{children}</div>
