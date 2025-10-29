@@ -14,22 +14,22 @@ type BoundedProps<C extends ElementType = "section"> = {
 } & Omit<ComponentPropsWithoutRef<C>, "className" | "style" | "children">;
 
 export function Bounded<C extends ElementType = "section">({
-  as,
+  as: Comp = "section" as C,
   className,
   children,
   style,
   ...restProps
 }: BoundedProps<C>) {
-  const Comp = as || ("section" as C);
-
   return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     <Comp
       className={clsx(
         "px-6 ~py-10/16 [.header+&]:pt-44 [.header+&]:md:pt-32",
         className
       )}
       style={style}
-      {...(restProps as ComponentPropsWithoutRef<C>)}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {...(restProps as any)}
     >
       <div className="mx-auto w-full max-w-6xl">{children}</div>
     </Comp>
