@@ -32,6 +32,7 @@ async function uploadFileToGitHub(
       if (!Array.isArray(data) && "sha" in data) {
         fileSha = data.sha;
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       // File doesn't exist yet, which is fine
       if (error.status !== 404) {

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { ButtonLink } from "./ButtonLink";
 import { createClient } from "@prismicio/client";
 import { PrismicLink } from "@prismicio/react";
 import { UserButton } from "@civic/auth-web3/react";

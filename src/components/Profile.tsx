@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { SkateboardProduct } from "@/slices/ProductGrid/SkateboardProduct";
+
 import { useUser } from "@civic/auth-web3/react";
 
 import { ButtonLink } from "./ButtonLink";
@@ -74,14 +74,15 @@ export function Profile({ userProfile }: Props) {
   const router = useRouter();
   const { signOut } = useUser();
 
-  if (!userProfile) return redirect("/");
-
-  console.log({ userProfile });
   const [activeTab, setActiveTab] = useState<"owned" | "created" | "favorites">(
     "owned"
   );
 
   const solBalance = useSolBalance(new PublicKey(userProfile.walletAddress));
+
+  if (!userProfile) return redirect("/");
+
+  console.log({ userProfile });
   console.log({ solBalance });
 
   const isOwnProfile = userProfile?.walletAddress === userProfile.walletAddress;
@@ -159,7 +160,7 @@ export function Profile({ userProfile }: Props) {
               await signOut();
               router.push("/");
             }}
-            className="p-2 bg-stone-800 flex items-center justify-center self-center h-10 w-10 rounded-full hover:bg-stone-700 transition-colors duration-200 ease-in-out"
+            className="p-2 bg-stone-800 flex items-center justify-center selfc h-10 w-10 rounded-full hover:bg-stone-700 transition-colors duration-200 ease-in-out"
             title="Logout"
           >
             <LogOut size={18} className="text-white" />
@@ -228,9 +229,11 @@ export function Profile({ userProfile }: Props) {
                 >
                   <div className="border-[1px] border-gray-100/20 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                     {board.image && (
-                      <img
+                      <Image
                         src={board.image}
                         alt={board.name}
+                        width={400}
+                        height={300}
                         className="w-full h-48 object-cover rounded-md mb-4"
                       />
                     )}
