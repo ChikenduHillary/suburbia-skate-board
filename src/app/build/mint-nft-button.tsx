@@ -3,11 +3,7 @@ import { createNft } from "@metaplex-foundation/mpl-token-metadata";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
-import {
-  generateSigner,
-  transactionBuilder,
-  publicKey,
-} from "@metaplex-foundation/umi";
+import { generateSigner, transactionBuilder } from "@metaplex-foundation/umi";
 
 import type { Amount } from "@metaplex-foundation/umi";
 
@@ -23,6 +19,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 interface MintNFTButtonProps {
   walletAddress: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: any;
 }
 
@@ -143,7 +140,6 @@ export default function MintNFTButton({
       console.log("Creating NFT...");
       let signature;
       const maxRetries = 3;
-      let lastError;
       let mint; // Declare mint outside the loop
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -186,9 +182,9 @@ export default function MintNFTButton({
             signature: signature.toString(),
           });
           break; // Success, exit retry loop
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           console.error(`Attempt ${attempt} failed:`, error);
-          lastError = error;
 
           if (error.logs) {
             console.error("Transaction logs:", error.logs);
@@ -253,6 +249,7 @@ export default function MintNFTButton({
       alert(
         `NFT minted successfully!\n\nView on Solana Explorer:\nMint: ${mintUrl}\nTransaction: ${txUrl}`
       );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Minting failed:", error);
       alert(`Minting failed: ${error.message || "Unknown error"}`);

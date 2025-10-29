@@ -30,14 +30,14 @@ export default async function ProfilePage() {
   const solWalletAddress = user.solana.address;
 
   // First check if user exists
-  let userDB = await convex.query(api.users.getUserByWallet, {
+  const userDB = await convex.query(api.users.getUserByWallet, {
     walletAddress: solWalletAddress!,
   });
 
   if (!userDB) {
     try {
       // Create user first since airdrop might fail
-      const newUser = await convex.mutation(api.users.createUser, {
+      await convex.mutation(api.users.createUser, {
         walletAddress: solWalletAddress!,
         username: name || solWalletAddress!.slice(0, 8),
         avatarUrl: picture,
@@ -47,18 +47,24 @@ export default async function ProfilePage() {
       // Attempt airdrop with smaller amount and better error handling
       try {
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-        let receiver = new PublicKey(solWalletAddress);
+        const receiver = new PublicKey(solWalletAddress);
         // Request smaller amount (2 SOL instead of 5)
-        let airdropAmt = 2 * LAMPORTS_PER_SOL;
-        let sig = await connection.requestAirdrop(receiver, airdropAmt);
+        const airdropAmt = 2 * LAMPORTS_PER_SOL;
+        const sig = await connection.requestAirdrop(receiver, airdropAmt);
         await connection.confirmTransaction(sig);
         console.log("Airdrop successful:", sig);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Handle airdrop failure gracefully
         console.log(
           "Note: Airdrop unavailable. Please visit faucet.solana.com"
         );
-        if (error?.message?.includes("429")) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "message" in error &&
+          typeof error.message === "string" &&
+          error.message.includes("429")
+        ) {
           return (
             <div className="flex min-h-screen items-center justify-center">
               <div className="text-center max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -66,7 +72,7 @@ export default async function ProfilePage() {
                   Profile Created Successfully
                 </h1>
                 <p className="text-gray-600 mb-4">
-                  To start minting NFTs, you'll need some devnet SOL.
+                  To start minting NFTs, you&apos;ll need some devnet SOL.
                 </p>
                 <div className="space-y-4">
                   <p className="text-sm text-gray-500">

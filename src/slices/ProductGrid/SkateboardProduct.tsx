@@ -20,7 +20,7 @@ async function getDominantColor(url: string) {
       json.dominant_colors.vibrant?.hex ||
       json.dominant_colors.vibrant_light?.hex
     );
-  } catch (error) {
+  } catch {
     // Fallback color in case of fetch error
     return "#ffffff";
   }

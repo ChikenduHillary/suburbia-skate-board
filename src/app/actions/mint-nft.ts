@@ -1,13 +1,6 @@
 "use server";
 
 import { NFTStorage } from "nft.storage";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
-import { createNft } from "@metaplex-foundation/mpl-token-metadata";
-import { generateSigner } from "@metaplex-foundation/umi";
-import { base58 } from "@metaplex-foundation/umi/serializers";
-import { clusterApiUrl } from "@solana/web3.js";
-
 // Create NFT Storage client
 const client = new NFTStorage({ token: process.env.NFT_STORAGE_KEY! });
 

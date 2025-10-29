@@ -11,6 +11,7 @@ export async function mintSkateboardNFT(
   description: string,
   imageUri: string,
   attributes: Array<{ trait_type: string; value: string }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: any
 ) {
   try {
