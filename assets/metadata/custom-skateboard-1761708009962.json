@@ -1,0 +1,23 @@
+{
+  "name": "Custom Skateboard",
+  "description": "A unique custom skateboard NFT",
+  "image": "https://raw.githubusercontent.com/ChikenduHillary/suburbia-skate-board/master/assets/nfts/custom-skateboard-1761708009962.png",
+  "attributes": [
+    {
+      "trait_type": "Wheel",
+      "value": "yellow"
+    },
+    {
+      "trait_type": "Deck",
+      "value": "yellow-and-black"
+    },
+    {
+      "trait_type": "Truck",
+      "value": "black"
+    },
+    {
+      "trait_type": "Bolt",
+      "value": "black"
+    }
+  ]
+}
