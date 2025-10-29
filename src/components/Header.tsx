@@ -3,6 +3,7 @@ import { Logo } from "./Logo";
 import { ButtonLink } from "./ButtonLink";
 import { createClient } from "@prismicio/client";
 import { PrismicLink } from "@prismicio/react";
+import { UserButton } from "@civic/auth-web3/react";
 
 export async function Header() {
   const client = createClient("suburbia-sb", {});
@@ -14,6 +15,7 @@ export async function Header() {
         <Link href={"/"} className="justify-self-start">
           <Logo className="text-brand-purple ~h-12/20" />
         </Link>
+
         <nav
           aria-label="Main navigation"
           className="col-span-full row-start-2 md:col-span-1 md:col-start-2 md:row-start-1"
@@ -27,10 +29,7 @@ export async function Header() {
           </ul>
         </nav>
         <div className="justify-self-end">
-          <ButtonLink href="" icon="cart" aria-label="Cart (1)">
-            <span className="md:hidden">1</span>
-            <span className="hidden md:inline">Cart (1)</span>
-          </ButtonLink>
+          <UserButton />
         </div>
       </div>
     </header>

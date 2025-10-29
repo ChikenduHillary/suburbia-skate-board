@@ -9,15 +9,21 @@ import { Scribble } from "./Scribble";
 import { Content, isFilled } from "@prismicio/client";
 
 async function getDominantColor(url: string) {
-  const paletteURL = new URL(url);
-  paletteURL.searchParams.set("palette", "json");
+  try {
+    const paletteURL = new URL(url);
+    paletteURL.searchParams.set("palette", "json");
 
-  const res = await fetch(paletteURL);
-  const json = await res.json();
+    const res = await fetch(paletteURL);
+    const json = await res.json();
 
-  return (
-    json.dominant_colors.vibrant?.hex || json.dominant_colors.vibrant_light?.hex
-  );
+    return (
+      json.dominant_colors.vibrant?.hex ||
+      json.dominant_colors.vibrant_light?.hex
+    );
+  } catch (error) {
+    // Fallback color in case of fetch error
+    return "#ffffff";
+  }
 }
 
 type Props = {
@@ -40,7 +46,7 @@ export async function SkateboardProduct({ id }: Props) {
 
   const dominateColor = isFilled.image(product.data.image)
     ? await getDominantColor(product.data.image.url)
-    : undefined;
+    : "#ffffff";
 
   return (
     <div className="group relative mx-auto w-full max-w-72 px-8 pt-4">
@@ -71,6 +77,10 @@ export async function SkateboardProduct({ id }: Props) {
       <h3 className="my-2 text-center font-sans leading-tight ~text-lg/xl">
         {product.data.name}
       </h3>
+
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <ButtonLink field={product.data.cutomizer_link}>Customize</ButtonLink>
+      </div>
     </div>
   );
 }

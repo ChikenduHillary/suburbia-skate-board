@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Bowlby_One_SC, DM_Mono } from "next/font/google";
+import { ConvexClientProvider } from "./ConvexClientProvider";
+import { CivicAuthProvider } from "@civic/auth-web3/nextjs";
+import { SolanaProvider } from "./SolanaProvider";
+
 import "./globals.css";
-import { Header } from "@/components/Header";
 
 const dmMono = DM_Mono({
   variable: "--font-dm-mono",
@@ -29,12 +32,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${bowlby.variable} ${dmMono.variable} antialiased font-mono font-medium text-zinc-800`}
-      >
-        <Header />
-        {children}
-      </body>
+      <CivicAuthProvider>
+        <ConvexClientProvider>
+          <SolanaProvider>
+            <body
+              className={`${bowlby.variable} ${dmMono.variable} antialiased font-mono font-medium text-zinc-800`}
+            >
+              {children}
+            </body>
+          </SolanaProvider>
+        </ConvexClientProvider>
+      </CivicAuthProvider>
     </html>
   );
 }
