@@ -27,6 +27,7 @@ export function Bounded<C extends ElementType = "section">({
         className
       )}
       style={style}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {...(restProps as any)}
     >
       <div className="mx-auto w-full max-w-6xl">{children}</div>
