@@ -49,10 +49,21 @@ export default async function ProfilePage() {
       try {
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
         const receiver = new PublicKey(solWalletAddress);
-        // Request smaller amount (2 SOL instead of 5)
-        const airdropAmt = 2 * LAMPORTS_PER_SOL;
+
+        // Request smaller amount (1 SOL)
+        const airdropAmt = 1 * LAMPORTS_PER_SOL;
+
+        console.log("Requesting airdrop...");
         const sig = await connection.requestAirdrop(receiver, airdropAmt);
-        await connection.confirmTransaction(sig);
+
+        // Use a more reliable confirmation method with timeout
+        const latestBlockhash = await connection.getLatestBlockhash();
+        await connection.confirmTransaction({
+          signature: sig,
+          blockhash: latestBlockhash.blockhash,
+          lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+        });
+
         console.log("Airdrop successful:", sig);
       } catch (error: unknown) {
         // Handle airdrop failure gracefully
