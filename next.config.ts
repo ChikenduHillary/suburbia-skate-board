@@ -2,9 +2,12 @@ import { createCivicAuthPlugin } from "@civic/auth-web3/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow remote images from Unsplash used in dummy/test content
   images: {
-    domains: ["auth.civic.com", "avatars.githubusercontent.com"],
+    domains: [
+      "auth.civic.com",
+      "avatars.githubusercontent.com",
+      "raw.githubusercontent.com",
+    ],
   },
   experimental: {
     serverActions: {

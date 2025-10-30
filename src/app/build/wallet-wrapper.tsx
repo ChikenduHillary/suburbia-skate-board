@@ -71,5 +71,11 @@ export default function WalletWrapper() {
     );
   }
 
-  return <MintNFTButton walletAddress={solWalletAddress} wallet={solWallet} />;
+  return (
+    <MintNFTButton
+      walletAddress={solWalletAddress}
+      wallet={solWallet}
+      userName={user.user?.name}
+    />
+  );
 }
