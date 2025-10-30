@@ -37,10 +37,10 @@ export default function RootLayout({
         <ConvexClientProvider>
           <SolanaProvider>
             <body
-              className={`${bowlby.variable} ${dmMono.variable} dark antialiased font-mono font-medium text-zinc-800`}
+              className={`${bowlby.variable} ${dmMono.variable} antialiased font-mono font-medium text-zinc-800`}
             >
               {children}
-              <Toaster />
+              <Toaster className="dark" />
             </body>
           </SolanaProvider>
         </ConvexClientProvider>

@@ -35,8 +35,6 @@ export default function MintNFTButton({
   const [isMinting, setIsMinting] = useState(false);
   const publicKey = walletAddress ? new PublicKey(walletAddress) : null;
 
-  console.log({ publicKey });
-
   const handleMintNFT = async () => {
     console.log("Mint NFT button clicked");
     if (!publicKey || !wallet) {
