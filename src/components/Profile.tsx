@@ -101,21 +101,21 @@ export function Profile({ userProfile, allNFTs }: Props) {
   const isOwnProfile = userProfile?.walletAddress === userProfile.walletAddress;
 
   const tabs = [
-    {
-      id: "owned" as const,
-      label: "Owned Boards",
-      boards: userProfile.ownedBoards,
-    },
+    // {
+    //   id: "owned" as const,
+    //   label: "Owned Boards",
+    //   boards: userProfile.ownedBoards,
+    // },
     {
       id: "created" as const,
       label: "Created Boards",
       boards: userProfile.createdBoards,
     },
-    {
-      id: "favorites" as const,
-      label: "Favorites",
-      boards: userProfile.favoriteBoards,
-    },
+    // {
+    //   id: "favorites" as const,
+    //   label: "Favorites",
+    //   boards: userProfile.favoriteBoards,
+    // },
     {
       id: "all" as const,
       label: "All Skateboard NFTs",
@@ -188,7 +188,9 @@ export function Profile({ userProfile, allNFTs }: Props) {
         {/* Stats Section */}
         <div className="grid grid-cols-3 gap-4 mb-8 p-6 bg-stone-50/10 rounded-lg">
           <div className="text-center">
-            <div className="text-2xl font-bold">{solBalance || 0}</div>
+            <div className="text-2xl font-bold">
+              {(solBalance || 0).toFixed(2)}
+            </div>
             <div className="text-stone-400">SOL</div>
           </div>
           <div className="text-center">
