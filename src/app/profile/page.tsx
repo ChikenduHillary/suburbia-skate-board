@@ -28,6 +28,7 @@ export default async function ProfilePage() {
   if (!user) return redirect("/");
   const { name, picture, email } = user;
   const solWalletAddress = user.solana.address;
+  console.log("User wallet address:", solWalletAddress);
 
   // First check if user exists
   const userDB = await convex.query(api.users.getUserByWallet, {
@@ -117,6 +118,9 @@ export default async function ProfilePage() {
     walletAddress: solWalletAddress!,
   });
 
+  // Get all NFTs for the "All Skateboard NFTs" tab
+  const allNFTs = await convex.query(api.nfts.getAllNFTs);
+
   if (!userProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -140,5 +144,5 @@ export default async function ProfilePage() {
     totalPurchases: 0,
   };
 
-  return <Profile userProfile={enrichedProfile} />;
+  return <Profile userProfile={enrichedProfile} allNFTs={allNFTs} />;
 }

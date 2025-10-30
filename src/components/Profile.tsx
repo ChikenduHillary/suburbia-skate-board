@@ -65,18 +65,31 @@ type UserProfile = {
 
 type Props = {
   userProfile: UserProfile;
+  allNFTs?: Array<{
+    _id: string;
+    prismicId: string;
+    name: string;
+    image?: string;
+    price?: number;
+    description?: string;
+    mintAddress?: string;
+    attributes?: Array<{
+      trait_type: string;
+      value: string;
+    }>;
+  }>;
 };
 
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function Profile({ userProfile }: Props) {
+export function Profile({ userProfile, allNFTs }: Props) {
   const router = useRouter();
   const { signOut } = useUser();
 
-  const [activeTab, setActiveTab] = useState<"owned" | "created" | "favorites">(
-    "owned"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "owned" | "created" | "favorites" | "all"
+  >("owned");
 
   const solBalance = useSolBalance(new PublicKey(userProfile.walletAddress));
 
@@ -102,6 +115,11 @@ export function Profile({ userProfile }: Props) {
       id: "favorites" as const,
       label: "Favorites",
       boards: userProfile.favoriteBoards,
+    },
+    {
+      id: "all" as const,
+      label: "All Skateboard NFTs",
+      boards: allNFTs || [],
     },
   ];
 
@@ -196,8 +214,8 @@ export function Profile({ userProfile }: Props) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-6 py-3 font-medium transition-colors ${
                   activeTab === tab.id
-                    ? "border-b-2 border-stone-800 text-stone-800"
-                    : "text-stone-400 hover:text-stone-800"
+                    ? "border-b-2 border-stone-800 text-white"
+                    : "text-stone-600 hover:text-white"
                 }`}
               >
                 {tab.label} ({tab.boards.length})

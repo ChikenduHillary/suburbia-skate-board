@@ -56,3 +56,9 @@ export const getNFTByMint = query({
       .first();
   },
 });
+
+export const getAllNFTs = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("nfts").collect();
+  },
+});

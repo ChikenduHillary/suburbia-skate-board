@@ -15,16 +15,13 @@ export async function mintSkateboardNFT(
   wallet: any
 ) {
   try {
-    // Create UMI instance
     const umi = createUmi(clusterApiUrl("devnet"))
       .use(mplTokenMetadata())
       .use(irysUploader())
       .use(walletAdapterIdentity(wallet));
 
-    // Generate a new signer for the NFT
     const mint = generateSigner(umi);
 
-    // Create metadata
     const metadata = {
       name,
       description,
@@ -32,15 +29,13 @@ export async function mintSkateboardNFT(
       attributes,
     };
 
-    // Upload metadata to Arweave via Irys
     const uri = await umi.uploader.uploadJson(metadata);
 
-    // Create the NFT
     const tx = await createNft(umi, {
       mint,
       name,
-      uri: uri[0], // Irys returns an array
-      sellerFeeBasisPoints: percentAmount(5.5), // 5.5% royalty
+      uri: uri[0],
+      sellerFeeBasisPoints: percentAmount(5.5),
     }).sendAndConfirm(umi);
 
     console.log("NFT minted successfully!", tx);

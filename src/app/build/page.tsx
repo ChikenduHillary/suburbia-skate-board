@@ -10,6 +10,7 @@ import { asImageSrc } from "@prismicio/client";
 import Controls from "./controls";
 import Loading from "./loading";
 import WalletWrapper from "./wallet-wrapper";
+import { ButtonLink } from "@/components/ButtonLink";
 
 type SearchParams = {
   wheel?: string;
@@ -73,10 +74,15 @@ export default async function Page(props: {
             metals={metals}
             className="mb-6"
           />
-          {/* <ButtonLink href="" color="lime" icon="plus">
-            Add to cart
+          {/* <ButtonLink href="" color="lime">
+            View Profile
           </ButtonLink> */}
-          <WalletWrapper />
+          <div className="flex gap-10">
+            <WalletWrapper />
+            <Link href="/profile" className="underline mt-4 block text-center">
+              Profile
+            </Link>
+          </div>
         </div>
       </CustomizerControlsProvider>
       <Loading />

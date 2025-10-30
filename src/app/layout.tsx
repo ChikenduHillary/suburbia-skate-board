@@ -3,6 +3,7 @@ import { Bowlby_One_SC, DM_Mono } from "next/font/google";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { CivicAuthProvider } from "@civic/auth-web3/nextjs";
 import { SolanaProvider } from "./SolanaProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -36,9 +37,10 @@ export default function RootLayout({
         <ConvexClientProvider>
           <SolanaProvider>
             <body
-              className={`${bowlby.variable} ${dmMono.variable} antialiased font-mono font-medium text-zinc-800`}
+              className={`${bowlby.variable} ${dmMono.variable} dark antialiased font-mono font-medium text-zinc-800`}
             >
               {children}
+              <Toaster />
             </body>
           </SolanaProvider>
         </ConvexClientProvider>

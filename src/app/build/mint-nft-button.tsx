@@ -12,6 +12,7 @@ import { useCustomizerControls } from "./context";
 import { uploadToGitHub } from "../actions/github-storage";
 import { api } from "../../../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
+import { toast } from "sonner";
 
 import { PublicKey } from "@solana/web3.js";
 
@@ -21,11 +22,13 @@ interface MintNFTButtonProps {
   walletAddress: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wallet: any;
+  userName?: string;
 }
 
 export default function MintNFTButton({
   walletAddress,
   wallet,
+  userName,
 }: MintNFTButtonProps) {
   const { selectedWheel, selectedDeck, selectedTruck, selectedBolt } =
     useCustomizerControls();
@@ -43,12 +46,10 @@ export default function MintNFTButton({
 
     setIsMinting(true);
     try {
-      // Initialize UMI inside the function to ensure wallet is connected
       const umi = createUmi("https://api.devnet.solana.com")
         .use(mplTokenMetadata())
         .use(walletAdapterIdentity(wallet));
 
-      // Get the current skateboard design image
       const canvases = document.getElementsByTagName("canvas");
       if (canvases.length === 0) {
         throw new Error(
@@ -97,7 +98,6 @@ export default function MintNFTButton({
         },
       });
       try {
-        // Convert to PNG with transparency
         imageData = tempCanvas.toDataURL("image/png", 1.0);
         const dataSize = imageData.length;
         console.log(
@@ -106,9 +106,7 @@ export default function MintNFTButton({
           "KB"
         );
 
-        // Validate the captured image
         if (dataSize < 1000) {
-          // Less than 1KB is probably empty
           throw new Error("Captured image is too small, might be empty");
         }
       } catch (error) {
@@ -118,7 +116,6 @@ export default function MintNFTButton({
         );
       }
 
-      // Generate attributes from selected parts
       const attributes = [
         { trait_type: "Wheel", value: selectedWheel?.uid || "default" },
         { trait_type: "Deck", value: selectedDeck?.uid || "default" },
@@ -129,9 +126,18 @@ export default function MintNFTButton({
 
       // Upload image and metadata to GitHub
       console.log("Uploading to GitHub...");
+      const generateNFTName = () => {
+        const wheelName = selectedWheel?.uid || "Custom";
+        const capitalizedWheelName =
+          wheelName.charAt(0).toUpperCase() + wheelName.slice(1);
+        return `${capitalizedWheelName} Skateboard`;
+      };
+
+      const nftName = generateNFTName();
+
       const { imageUrl, metadataUrl } = await uploadToGitHub(imageData, {
-        name: "Custom Skateboard",
-        description: "A unique custom skateboard NFT",
+        name: nftName,
+        description: `A unique skateboard NFT made by ${userName || "Anonymous"}`,
         attributes,
       });
       console.log("Uploaded to GitHub:", { imageUrl, metadataUrl });
@@ -139,8 +145,8 @@ export default function MintNFTButton({
       // Create NFT
       console.log("Creating NFT...");
       let signature;
-      const maxRetries = 3;
-      let mint; // Declare mint outside the loop
+      const maxRetries = 2;
+      let mint;
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
@@ -155,7 +161,7 @@ export default function MintNFTButton({
           builder = builder.add(
             createNft(umi, {
               mint,
-              name: "Custom Skateboard",
+              name: nftName,
               uri: metadataUrl,
               sellerFeeBasisPoints: 500 as unknown as Amount<"%", 2>,
               symbol: "SKATE",
@@ -176,12 +182,11 @@ export default function MintNFTButton({
             })
           );
 
-          // umi.rpc.sendTransaction returns a transaction signature string; assign it directly.
           signature = txSignature;
           console.log("NFT created successfully:", {
             signature: signature.toString(),
           });
-          break; // Success, exit retry loop
+          break;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           console.error(`Attempt ${attempt} failed:`, error);
@@ -190,14 +195,12 @@ export default function MintNFTButton({
             console.error("Transaction logs:", error.logs);
           }
 
-          // If this was the last attempt, throw the error
           if (attempt === maxRetries) {
             throw new Error(
               `Failed to mint NFT after ${maxRetries} attempts: ${error.message || "Unknown error"}`
             );
           }
 
-          // Wait before retrying (exponential backoff)
           const waitTime = 1000 * attempt;
           console.log(`Waiting ${waitTime}ms before retry...`);
           await new Promise((resolve) => setTimeout(resolve, waitTime));
@@ -214,7 +217,6 @@ export default function MintNFTButton({
         signature: signature?.toString(),
       };
 
-      // Get user ID from Convex
       const user = await convex.query(api.users.getUserByWallet, {
         walletAddress: publicKey.toString(),
       });
@@ -224,21 +226,19 @@ export default function MintNFTButton({
       }
 
       console.log("Saving to Convex...");
-      // Save NFT to Convex
       await convex.mutation(api.nfts.createNFT, {
         prismicId: "custom-skateboard",
         ownerId: user._id,
         creatorId: user._id,
-        name: "Custom Skateboard",
+        name: nftName,
         image: imageUrl,
-        description: "A unique custom skateboard NFT",
+        description: `A unique skateboard NFT made by ${userName || "Anonymous"}`,
         mintAddress: mint.publicKey.toString(),
         metadataUri: metadataUrl,
         attributes,
       });
       console.log("Saved to Convex successfully");
 
-      // Create explorer links
       const mintUrl = `https://explorer.solana.com/address/${mintResult.mintAddress}?cluster=devnet`;
       const txUrl = `https://explorer.solana.com/tx/${mintResult.signature}?cluster=devnet`;
 
@@ -246,13 +246,25 @@ export default function MintNFTButton({
       console.log("- Mint address:", mintUrl);
       console.log("- Transaction:", txUrl);
 
-      alert(
-        `NFT minted successfully!\n\nView on Solana Explorer:\nMint: ${mintUrl}\nTransaction: ${txUrl}`
-      );
+      toast.success("NFT minted successfully!", {
+        description: "Your custom skateboard NFT has been created.",
+        action: {
+          label: "View on Explorer",
+          onClick: () => window.open(mintUrl, "_blank"),
+        },
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Minting failed:", error);
-      alert(`Minting failed: ${error.message || "Unknown error"}`);
+
+      toast.error("Minting failed", {
+        description:
+          error.message || "An unknown error occurred while minting your NFT.",
+        action: {
+          label: "Retry",
+          onClick: () => handleMintNFT(),
+        },
+      });
 
       if (error.logs) {
         console.error("Transaction logs:", error.logs);
@@ -269,7 +281,7 @@ export default function MintNFTButton({
     <button
       onClick={handleMintNFT}
       disabled={isMinting || !publicKey}
-      className="button-cutout group mx-4 inline-flex items-center bg-gradient-to-b from-25% to-75% bg-[length:100%_400%] font-bold transition-[filter,background-position] duration-300 hover:bg-bottom from-brand-lime to-brand-orange text-black gap-3 px-1 text-lg ~py-2.5/3"
+      className="button-cutout group disabled:cursor-not-allowed disabled:bg-brand-orange mx-4 inline-flex items-center bg-gradient-to-b from-25% to-75% bg-[length:100%_400%] font-bold transition-[filter,background-position] duration-300 hover:bg-bottom from-brand-lime to-brand-orange text-black gap-3 px-1 text-lg ~py-2.5/3"
     >
       <div className="flex size-6 items-center justify-center transition-transform group-hover:-rotate-[25deg] [&>svg]:h-full [&>svg]:w-full">
         <svg
