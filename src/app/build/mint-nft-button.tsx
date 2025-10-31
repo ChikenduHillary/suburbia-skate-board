@@ -14,7 +14,12 @@ import { api } from "../../../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
 import { toast } from "sonner";
 
-import { PublicKey } from "@solana/web3.js";
+import {
+  PublicKey,
+  Connection,
+  clusterApiUrl,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -35,10 +40,76 @@ export default function MintNFTButton({
   const [isMinting, setIsMinting] = useState(false);
   const publicKey = walletAddress ? new PublicKey(walletAddress) : null;
 
+  // Function to attempt airdrop up to 3 times
+  async function attemptAirdrop(receiver: PublicKey) {
+    const airdropConnection = new Connection(
+      clusterApiUrl("devnet"),
+      "confirmed"
+    );
+    const airdropAmt = 1 * LAMPORTS_PER_SOL;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`Attempting airdrop ${attempt}/3...`);
+        const sig = await airdropConnection.requestAirdrop(
+          receiver,
+          airdropAmt
+        );
+
+        // Confirm transaction
+        const latestBlockhash = await airdropConnection.getLatestBlockhash();
+        await airdropConnection.confirmTransaction({
+          signature: sig,
+          blockhash: latestBlockhash.blockhash,
+          lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+        });
+
+        console.log("Airdrop successful!");
+        return true; // Success
+      } catch (error) {
+        console.log(`Airdrop attempt ${attempt} failed:`, error);
+        if (attempt === 3) {
+          console.error("All airdrop attempts failed.");
+          return false; // All attempts failed
+        }
+      }
+    }
+    return false;
+  }
+
   const handleMintNFT = async () => {
     console.log("Mint NFT button clicked");
     if (!publicKey || !wallet) {
       alert("Please connect your wallet first");
+      return;
+    }
+
+    // Check SOL balance before proceeding
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    let balance = await connection.getBalance(publicKey);
+    console.log("Current SOL balance:", balance / LAMPORTS_PER_SOL);
+
+    if (balance === 0) {
+      console.log("Balance is 0, attempting airdrop...");
+      const airdropSuccess = await attemptAirdrop(publicKey);
+      if (airdropSuccess) {
+        // Refetch balance after successful airdrop
+        balance = await connection.getBalance(publicKey);
+        console.log("Balance after airdrop:", balance / LAMPORTS_PER_SOL);
+      } else {
+        toast.error("Failed to airdrop SOL", {
+          description:
+            "Unable to get SOL for transaction fees. Please try again later.",
+        });
+        return;
+      }
+    }
+
+    if (balance === 0) {
+      toast.error("Insufficient SOL balance", {
+        description:
+          "You need SOL for transaction fees. Please fund your wallet.",
+      });
       return;
     }
 
