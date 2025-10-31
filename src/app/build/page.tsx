@@ -10,7 +10,6 @@ import { asImageSrc } from "@prismicio/client";
 import Controls from "./controls";
 import Loading from "./loading";
 import WalletWrapper from "./wallet-wrapper";
-import { ButtonLink } from "@/components/ButtonLink";
 
 type SearchParams = {
   wheel?: string;

@@ -89,14 +89,11 @@ export function Profile({ userProfile, allNFTs }: Props) {
 
   const [activeTab, setActiveTab] = useState<
     "owned" | "created" | "favorites" | "all"
-  >("owned");
+  >("created");
 
   const solBalance = useSolBalance(new PublicKey(userProfile.walletAddress));
 
   if (!userProfile) return redirect("/");
-
-  console.log({ userProfile });
-  console.log({ solBalance });
 
   const isOwnProfile = userProfile?.walletAddress === userProfile.walletAddress;
 

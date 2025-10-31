@@ -1,0 +1,9 @@
+Field,Value
+Project Name,Suburbia Skateboard Customizer
+Description,"A modern web application for customizing skateboards and minting them as NFTs on the Solana blockchain. Built with Next.js, featuring 3D visualization, real-time customization, and seamless NFT creation."
+Tech Stack,"Next.js 15, React 19, TypeScript, Tailwind CSS, Three.js, React Three Fiber, GSAP, Convex, Prismic, Solana Web3.js, Metaplex SDK, Civic Auth, NFT.Storage, GitHub API, Octokit"
+Repository Link,https://github.com/ChikenduHillary/suburbia-skate-board
+Demo Link,https://suburbia-skate-board.vercel.app/
+Demo Video Link,https://example.com/demo-video (Replace with actual video link)
+Team Members,Chikendu Hillary
+Features,"3D Skateboard Customization, NFT Minting on Solana, User Authentication via Civic, Profile Management, Responsive Design, CMS Integration with Prismic, Asset Storage on GitHub, Real-time Updates"

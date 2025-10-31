@@ -23,20 +23,29 @@ type ExistingWeb3UserContext = Web3UserContextType & {
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export default async function ProfilePage() {
-  const user = (await getUser()) as unknown as ExistingWeb3UserContext;
+  let user: ExistingWeb3UserContext;
+  try {
+    user = (await getUser()) as unknown as ExistingWeb3UserContext;
 
-  if (!user) return redirect("/");
+    if (!user || !user.solana?.address) {
+      return redirect("/");
+    }
+  } catch (error) {
+    console.error("Failed to get user:", error);
+    return redirect("/");
+  }
+
   const { name, picture, email } = user;
   const solWalletAddress = user.solana.address;
   console.log("User wallet address:", solWalletAddress);
 
-  // First check if user exists
-  const userDB = await convex.query(api.users.getUserByWallet, {
-    walletAddress: solWalletAddress!,
-  });
+  try {
+    // First check if user exists
+    const userDB = await convex.query(api.users.getUserByWallet, {
+      walletAddress: solWalletAddress,
+    });
 
-  if (!userDB) {
-    try {
+    if (!userDB) {
       // Create user first since airdrop might fail
       await convex.mutation(api.users.createUser, {
         walletAddress: solWalletAddress!,
@@ -118,10 +127,10 @@ export default async function ProfilePage() {
           );
         }
       }
-    } catch (error) {
-      console.error("Profile creation failed:", error);
-      throw error;
     }
+  } catch (error) {
+    console.log("Profile creation failed:", error);
+    throw error;
   }
 
   // Get full user profile with boards
