@@ -93,7 +93,7 @@ export default async function ProfilePage() {
                   Profile Created Successfully
                 </h1>
                 <p className="text-gray-600 mb-4">
-                  To start minting NFTs, you'll need some devnet SOL.
+                  To start minting NFTs, you&apos;ll need some devnet SOL.
                 </p>
                 <div className="space-y-4">
                   <p className="text-sm text-gray-500">
