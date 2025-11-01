@@ -6,6 +6,7 @@ export type ButtonProps = PrismicNextLinkProps & {
   color?: "orange" | "purple" | "lime";
   size?: "sm" | "md" | "lg";
   icon?: "cart" | "skateboard" | "plus";
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 export function ButtonLink({
@@ -14,6 +15,7 @@ export function ButtonLink({
   icon,
   children,
   className,
+  onClick,
   ...props
 }: ButtonProps) {
   return (
@@ -34,6 +36,7 @@ export function ButtonLink({
       prefetch={
         typeof props.prefetch === "boolean" ? props.prefetch : undefined
       }
+      onClick={onClick}
     >
       {icon ? (
         <>
