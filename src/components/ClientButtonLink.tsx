@@ -17,7 +17,7 @@ export function ClientButtonLink(props: ButtonProps) {
     if (!user.user) {
       e.preventDefault();
       toast.error("You need to sign in to build your board", {
-        description: "Please log in to access the board builder.",
+        description: "If youre signed in, please refresh the page.",
       });
       return;
     }
