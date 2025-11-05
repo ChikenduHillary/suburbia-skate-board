@@ -38,6 +38,8 @@ export default function MintNFTButton({
   const { selectedWheel, selectedDeck, selectedTruck, selectedBolt } =
     useCustomizerControls();
   const [isMinting, setIsMinting] = useState(false);
+  const [isAirdropping, setIsAirdropping] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const publicKey = walletAddress ? new PublicKey(walletAddress) : null;
 
   // Function to attempt airdrop up to 3 times
@@ -91,16 +93,15 @@ export default function MintNFTButton({
 
     if (balance === 0) {
       console.log("Balance is 0, attempting airdrop...");
+      setIsAirdropping(true);
       const airdropSuccess = await attemptAirdrop(publicKey);
+      setIsAirdropping(false);
       if (airdropSuccess) {
         // Refetch balance after successful airdrop
         balance = await connection.getBalance(publicKey);
         console.log("Balance after airdrop:", balance / LAMPORTS_PER_SOL);
       } else {
-        toast.error("Failed to airdrop SOL", {
-          description:
-            "Unable to get SOL for transaction fees. Please try again later.",
-        });
+        setShowModal(true);
         return;
       }
     }
@@ -346,30 +347,104 @@ export default function MintNFTButton({
     }
   };
 
+  const handleCopyAddress = async () => {
+    if (walletAddress) {
+      await navigator.clipboard.writeText(walletAddress);
+      toast.success("Address copied to clipboard!");
+    }
+  };
+
   return (
-    <button
-      onClick={handleMintNFT}
-      disabled={isMinting || !publicKey}
-      className="button-cutout group disabled:cursor-not-allowed disabled:bg-brand-orange mx-4 inline-flex items-center bg-gradient-to-b from-25% to-75% bg-[length:100%_400%] font-bold transition-[filter,background-position] duration-300 hover:bg-bottom from-brand-lime to-brand-orange text-black gap-3 px-1 text-lg ~py-2.5/3"
-    >
-      <div className="flex size-6 items-center justify-center transition-transform group-hover:-rotate-[25deg] [&>svg]:h-full [&>svg]:w-full">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-          />
-        </svg>
-      </div>
-      <div className="w-px self-stretch bg-black/25" />
-      {isMinting ? "Minting..." : "Mint as NFT"}
-    </button>
+    <>
+      <button
+        onClick={handleMintNFT}
+        disabled={isMinting || isAirdropping || !publicKey}
+        className="button-cutout group disabled:cursor-not-allowed disabled:bg-brand-orange mx-4 inline-flex items-center bg-gradient-to-b from-25% to-75% bg-[length:100%_400%] font-bold transition-[filter,background-position] duration-300 hover:bg-bottom from-brand-lime to-brand-orange text-black gap-3 px-1 text-lg ~py-2.5/3"
+      >
+        <div className="flex size-6 items-center justify-center transition-transform group-hover:-rotate-[25deg] [&>svg]:h-full [&>svg]:w-full">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+            />
+          </svg>
+        </div>
+        <div className="w-px self-stretch bg-black/25" />
+        {isAirdropping
+          ? "Airdropping SOL..."
+          : isMinting
+            ? "Minting..."
+            : "Mint as NFT"}
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className=" p-6 rounded-lg bg-black/90 shadow-lg max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Airdrop Failed</h2>
+            <p className="mb-4">
+              Unable to get SOL for transaction fees. Please fund your wallet
+              using the Solana faucet.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">
+                Wallet Address:
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={walletAddress}
+                  readOnly
+                  className="flex-1 px-3 py-2 rounded-md bg-gray-100/10"
+                />
+                <button
+                  onClick={handleCopyAddress}
+                  className="p-2 bg-gray-100/10 hover:bg-gray-100/20 rounded-md"
+                  title="Copy to clipboard"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <a
+                href="https://faucet.solana.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-center"
+              >
+                Go to Solana Faucet
+              </a>
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-100/10 hover:bg-gray-100/20 rounded-md"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
