@@ -6,8 +6,8 @@ import { userHasWallet, Web3UserContextType } from "@civic/auth-web3";
 
 type ExistingWeb3UserContext = Web3UserContextType & {
   solana: {
-    address: string; // the base58 public key of the embedded wallet
-    wallet: Wallet; // a Solana Wallet object
+    address: string;
+    wallet: Wallet;
   };
   createWallet: () => Promise<void>;
   walletCreationInProgress: boolean;
